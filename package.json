@@ -1,0 +1,20 @@
+{
+  "name": "youtube-local-downloader",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "productName": "ClipDesk",
+  "description": "YouTube / Bilibili / 微信视频号下载器 — vibe coding by Haifeng.",
+  "author": "Haifeng",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "node-forge": "^1.4.0"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "version": "2.1.0",
+  "automatedTests": 19,
+  "packagedDesktopPassed": true,
+  "languageSwitchPassed": true,
+  "channelsDefaultQuality": {
+    "video": "original",
+    "audio": "original",
+    "quality": "2160p"
+  },
+  "originalTitlePreserved": true,
+  "bilibiliLiveDownload": {
+    "passed": true,
+    "testedHeight": 360,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "nonSilentAudio": true
+  },
+  "wechatShareAuthenticatedDownloadVerified": false,
+  "wechatClientLiveCaptureVerified": false,
+  "exe": {
+    "bytes": 256713216,
+    "sha256": "33aaeeb7647d6f17e843b439db50d28ff74cb53895d75ea5579898747de7f635"
+  }
+}

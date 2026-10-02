@@ -1,0 +1,45 @@
+import { cp, mkdir, readFile, writeFile, readdir, stat, realpath } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import * as ResEdit from 'resedit';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const source = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const build = path.join(source, 'work', 'package');
+const runtime = path.join(build, 'runtime');
+await mkdir(runtime, { recursive: true });
+await cp(path.join(path.dirname(require.resolve('electron/package.json')), 'dist'), runtime, { recursive: true });
+const app = path.join(runtime, 'resources/app');
+await mkdir(app, { recursive: true });
+for (const name of ['core.mjs', 'server.mjs', 'package.json', 'public', 'desktop', 'channels', 'build', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) await cp(path.join(source, name), path.join(app, name), { recursive: true });
+await cp(await realpath(path.join(source, 'node_modules/node-forge')), path.join(app, 'node_modules/node-forge'), { recursive: true });
+await cp(path.join(source, 'tools'), path.join(runtime, 'resources/tools'), { recursive: true });
+const raw = await readFile(path.join(runtime, 'electron.exe'));
+const executable = ResEdit.NtExecutable.from(raw, { ignoreCert: true });
+const resources = ResEdit.NtExecutableResource.from(executable);
+const icon = ResEdit.Data.IconFile.from(await readFile(path.join(source, 'build/ClipDesk.ico')));
+for (const group of ResEdit.Resource.IconGroupEntry.fromEntries(resources.entries)) ResEdit.Resource.IconGroupEntry.replaceIconsForResource(resources.entries, group.id, group.lang, icon.icons.map(i => i.data));
+for (const version of ResEdit.Resource.VersionInfo.fromEntries(resources.entries)) {
+  version.setFileVersion(2, 1, 0, 0, 1033); version.setProductVersion(2, 1, 0, 0, 1033);
+  version.setStringValues({ lang: 1033, codepage: 1200 }, { FileDescription: 'ClipDesk · 视频下载工作空间', ProductName: 'ClipDesk', CompanyName: 'Haifeng', OriginalFilename: 'ClipDesk.exe', InternalName: 'ClipDesk', LegalCopyright: 'vibe coding by Haifeng.' });
+  version.outputToResourceEntries(resources.entries);
+}
+resources.outputResource(executable);
+await writeFile(path.join(runtime, 'ClipDesk.exe'), Buffer.from(executable.generate()));
+// Keep the distribution limited to its branded executable.
+const { rm } = await import('node:fs/promises'); await rm(path.join(runtime, 'electron.exe'));
+const zip = path.join(build, 'runtime.zip');
+const zipScript = path.join(build, 'zip-runtime.ps1');
+await writeFile(zipScript, `$ErrorActionPreference='Stop'\nAdd-Type -AssemblyName System.IO.Compression.FileSystem\n$sourceDir='${runtime.replace(/'/g, "''")}'\n$targetZip='${zip.replace(/'/g, "''")}'\nif (Test-Path -LiteralPath $targetZip) { Remove-Item -LiteralPath $targetZip }\n[IO.Compression.ZipFile]::CreateFromDirectory($sourceDir,$targetZip,[IO.Compression.CompressionLevel]::Optimal,$false)\n`);
+let r = spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', zipScript], { stdio: 'inherit', windowsHide: true });
+if (r.status !== 0) throw Error('Runtime packaging failed');
+const data = await readFile(zip), digest = createHash('sha256').update(data).digest('hex');
+const launcher = (await readFile(path.join(source, 'build/PortableLauncher.cs'), 'utf8')).replace('__PAYLOAD_HASH__', digest);
+const cs = path.join(build, 'PortableLauncher.cs'); await writeFile(cs, launcher);
+const output = path.join(source, 'dist', 'ClipDesk-2.1.0.exe');
+await mkdir(path.dirname(output), { recursive: true });
+r = spawnSync('C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe', ['/nologo', '/target:winexe', '/platform:x64', '/optimize+', '/utf8output', '/reference:System.Windows.Forms.dll', '/reference:System.Drawing.dll', '/reference:System.IO.Compression.dll', '/reference:System.IO.Compression.FileSystem.dll', `/win32icon:${path.join(source, 'build/ClipDesk.ico')}`, `/resource:${zip},ClipDesk.Payload`, `/out:${output}`, cs], { stdio: 'inherit', windowsHide: true });
+if (r.status !== 0) throw Error('EXE compilation failed');
+console.log(JSON.stringify({ output, bytes: (await stat(output)).size, runtimeSha256: digest }));

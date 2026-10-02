@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="app-token" content="__APP_TOKEN__">
+  <meta name="description" content="本地 YouTube 视频下载器，选择清晰度与码率，导出带声音的 MP4。">
+  <title>ClipDesk · 视频下载工作空间</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/desktop.css">
+  <script src="/app.js" type="module"></script>
+</head>
+<body>
+  <div class="desktop-titlebar" id="desktop-titlebar" hidden><div class="window-brand"><img src="/app-icon.png" alt=""><span>ClipDesk</span><span class="window-version">2.1</span></div><div class="window-controls"><button data-window="minimize" aria-label="最小化">—</button><button data-window="maximize" aria-label="最大化或还原">□</button><button data-window="close" aria-label="关闭">×</button></div></div>
+  <aside class="sidebar">
+    <a class="brand" href="#download" aria-label="ClipDesk 首页"><img class="brand-logo" src="/app-icon.png" alt=""><span>ClipDesk<small>VIDEO WORKSPACE</small></span></a>
+    <div class="nav-label">工作空间</div>
+    <button type="button" data-view="download" class="nav-item active"><span>↧</span>视频下载</button>
+    <button type="button" data-view="channels" class="nav-item"><span>◉</span>视频号捕捉<span class="count" id="capture-count">0</span></button>
+    <button type="button" data-view="history" class="nav-item"><span>◷</span>下载记录<span class="count" id="job-count">0</span></button>
+    <div class="nav-label tools-label">偏好设置</div><button type="button" data-view="settings" class="nav-item"><span>⚙</span>设置</button>
+    <div class="sidebar-foot"><div class="local-label"><span class="local-dot"></span>本地处理 · 私人工作空间</div><div class="creator-profile"><img src="/haifeng-avatar.png" alt="Haifeng 的头像"><div><strong>Haifeng</strong><span>Vibe Coder</span></div><span class="creator-badge">✦</span></div><p>vibe coding by Haifeng.</p></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="breadcrumb">工作空间 <span class="slash">/</span> <strong id="breadcrumb-current">视频下载</strong></div><div class="top-actions"><span class="system" id="system-state"><i></i>检查组件中</span><select class="language-select" id="top-language" aria-label="界面语言"><option value="zh">中文</option><option value="en">English</option></select><button id="top-settings" class="icon-button" aria-label="打开设置">⚙</button></div></header>
+    <div class="workspace">
+      <div id="download-view">
+      <section id="download" aria-labelledby="page-title">
+        <div class="heading"><div><div class="eyebrow">YOUR VIDEO WORKSPACE</div><h1 id="page-title">视频下载<span class="red-period">.</span></h1><p>选择清晰度与码率，把喜欢的视频保存到电脑。</p></div><span class="format-pill">MP4 <span>画面与声音</span></span></div>
+        <div class="destination-bar"><span class="folder-outline">▱</span><div><small>默认保存位置</small><span id="default-directory-label">正在读取保存位置…</span></div><button id="change-directory-link" type="button">更改 <span>→</span></button></div>
+        <div class="card input-card">
+          <form id="parse-form">
+            <label for="url" class="field-label"><span class="step-number">01</span>视频链接</label>
+            <div class="url-row"><span class="link-icon" aria-hidden="true">↗</span><input id="url" type="url" placeholder="粘贴 YouTube、Bilibili 或 b23.tv 视频链接" autocomplete="off" required aria-describedby="link-help"><button type="button" id="paste" class="paste-button">粘贴</button><button id="parse-button" type="submit" class="primary">解析视频 <span aria-hidden="true">→</span></button></div>
+            <div class="input-foot"><span id="link-help">支持 YouTube、Shorts、Bilibili 视频与 b23.tv 分享链接。</span><details id="proxy-details"><summary>网络设置</summary><div class="proxy-panel"><label for="proxy">代理地址（可选）</label><input id="proxy" placeholder="http://127.0.0.1:7890" autocomplete="off"><small>无法连接 YouTube 时，可填写你已有的 HTTP / SOCKS5 代理。</small></div></details></div>
+          </form>
+          <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+        </div>
+        <div id="loading" class="card loading" hidden><span class="spinner"></span><div>正在获取视频信息<small>清晰度和码率将以实际可用格式为准。</small></div></div>
+        <div id="empty" class="empty-panel"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="9" width="38" height="29" rx="7" stroke="currentColor" stroke-width="1.7"/><path d="M20 18l11 6-11 6V18z" fill="currentColor"/><path d="M14 42h20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><h2>添加你的第一个视频</h2><p>粘贴 YouTube 或 Bilibili 链接，其他交给 ClipDesk。</p><div class="empty-tags"><span>按源视频选择清晰度</span><span>自动合并声音</span><span>每次确认保存位置</span></div></div>
+        <section class="card video-card" id="video-panel" hidden aria-labelledby="video-title">
+          <div class="video-summary"><div class="thumbnail" id="thumbnail-wrap"><img id="thumbnail" alt="视频封面" referrerpolicy="no-referrer" hidden><span id="thumb-fallback">▶</span><span class="duration" id="duration"></span></div><div class="video-meta"><span class="source-label"><span class="youtube-mark">▶</span>YouTube</span><h2 id="video-title"></h2><p id="video-channel"></p><div class="video-tags"><span>✓ 自动保留声音</span><span>MP4 格式</span></div></div></div>
+          <div class="settings">
+            <div class="section-label"><span class="step-number">02</span>导出设置</div>
+            <div class="quality-header"><label class="small-label">清晰度</label><span id="available-hint"></span></div><div class="quality-options" id="qualities" role="group" aria-label="清晰度"></div>
+            <div class="select-grid"><div><label for="format">源视频格式</label><select id="format"></select></div><div><label for="video-bitrate">视频码率</label><select id="video-bitrate"><option value="original">优先保留原画质</option><option value="1000">1 Mbps · 小文件</option><option value="2500">2.5 Mbps</option><option value="5000">5 Mbps</option><option value="8000">8 Mbps</option><option value="12000">12 Mbps</option><option value="20000">20 Mbps</option><option value="40000">40 Mbps</option></select></div><div><label for="audio-bitrate">音频码率</label><select id="audio-bitrate"><option value="original">优先保留原音质</option><option value="96">96 kbps</option><option value="128">128 kbps</option><option value="192">192 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option></select></div></div>
+            <p class="encoding-note" id="encoding-note">兼容格式直接合并；其他编码转为 H.264 / AAC。提高码率不会提升源视频细节。</p>
+          </div>
+          <div class="export-footer"><div class="export-info"><span class="file-symbol">↧</span><div><strong>有声 MP4</strong><small id="size-estimate">H.264 画面 · AAC 声音</small></div></div><button id="download-button" class="primary">选择位置并下载 <span aria-hidden="true">↓</span></button></div>
+        </section>
+      </section>
+      <section id="history" class="history" aria-labelledby="history-title"><div class="history-head"><h2 id="history-title">下载记录 <span id="history-total">0</span></h2><span id="history-summary">文件保存在本机</span></div><div id="jobs" class="job-list"></div><div id="no-jobs" class="no-jobs"><span>◷</span><strong>还没有下载记录</strong><small>开始第一个任务后，可在这里查看进度和打开文件。</small></div></section>
+      </div>
+      <section id="channels-view" hidden aria-labelledby="channels-title">
+        <div class="heading"><div><div class="eyebrow">WECHAT CHANNELS</div><h1 id="channels-title">视频号捕捉<span class="red-period">.</span></h1><p>在电脑微信中播放视频，ClipDesk 自动识别视频名称。</p></div><span class="format-pill">PC WECHAT</span></div>
+        <div class="card capture-control"><div class="capture-control-head"><div><span class="capture-state" id="capture-state">未开启捕捉</span><h2>捕捉电脑微信中播放的视频</h2><p>先开始捕捉，再重新打开微信的视频号播放窗口。</p></div><button class="primary" id="capture-toggle" type="button">开始捕捉 <span>◉</span></button></div><div class="capture-steps"><span><b>01</b> 开始捕捉</span><span>→</span><span><b>02</b> 在微信播放</span><span>→</span><span><b>03</b> 选择视频并保存</span></div><div class="capture-description">首次开启会确认本机证书和临时系统代理配置；停止捕捉或退出后恢复原设置。仅保留视频号视频信息。</div><div class="capture-source-note">默认保存原视频画质与音质。复制的下载链接可能限时有效或包含加密媒体，使用 ClipDesk 保存可自动处理。</div><div class="notice" id="capture-notice" role="status" hidden></div></div>
+        <div class="history-head capture-list-head"><h2>已捕捉视频 <span id="captured-total">0</span></h2><button id="clear-capture" class="secondary" type="button">清空捕捉列表</button></div><div id="captured-list" class="captured-list"></div>
+        <div class="card capture-empty" id="capture-empty"><div class="empty-icon">◉</div><h2>等待你在微信中播放</h2><p>视频名称、时长和可用画质会显示在这里。<br>开启后若没有记录，请重新打开视频号窗口并从头播放。</p></div>
+      </section>
+      <section id="settings-view" hidden aria-labelledby="settings-title">
+        <div class="heading"><div><div class="eyebrow">PREFERENCES</div><h1 id="settings-title">设置<span class="red-period">.</span></h1><p>让每次下载，都按你的习惯进行。</p></div><span class="settings-version">VERSION 2.1.0</span></div>
+        <div class="settings-card card"><div class="settings-section-head"><span class="setting-icon">▱</span><div><h2>下载与保存</h2><p>管理文件的默认保存位置。</p></div></div><div class="setting-row directory-setting"><div><label for="default-save-directory">默认保存文件夹</label><p>首次下载从这里开始，以后记住上次选择的文件夹。</p></div><div class="directory-control"><input id="default-save-directory" readonly aria-label="默认保存文件夹"><button id="choose-default-directory" type="button" class="secondary">选择文件夹 <span>…</span></button></div></div><div class="setting-row always-choose"><div><strong>每次下载前选择保存位置</strong><p>可以为每个视频指定文件夹和文件名。</p></div><span class="enabled-pill"><i></i>已开启</span></div><div id="settings-notice" class="notice" role="status" hidden></div></div>
+        <div class="settings-card card language-card"><div class="setting-row"><div><strong>界面语言</strong><p>中英文切换会立即生效，并在下次启动时保留。</p></div><select class="language-select" id="settings-language" aria-label="界面语言"><option value="zh">中文</option><option value="en">English</option></select></div></div>
+        <div class="about-card card"><div class="about-heading"><img src="/app-icon.png" alt="ClipDesk 图标"><div><h2>ClipDesk</h2><p>YouTube / Bilibili 下载 · 微信视频号捕捉 · 2.1.0</p></div><span class="about-version">DESKTOP EDITION</span></div><div class="creator-about"><div><span class="creator-overline">VIBE CODER</span><h3>Haifeng<span>✦</span></h3><p>vibe coding by Haifeng.</p></div></div></div>
+      </section>
+      <footer class="page-footer"><span><span class="local-dot"></span>本地处理 · 文件由你掌控</span><span>vibe coding by Haifeng.</span><span>ClipDesk / 2.1</span></footer>
+    </div>
+  </main>
+</body>
+</html>

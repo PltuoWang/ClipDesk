@@ -1,0 +1,13 @@
+downloads/
+node_modules/
+dist/
+work/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+tools/*.exe
+tools/*.zip
+tools/*.pending
+*.log
