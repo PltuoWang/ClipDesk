@@ -1,5 +1,7 @@
 # ClipDesk 2.1 · 视频下载工作空间
 
+**中文** | [English](README.en.md)
+
 Windows x64 桌面软件。红色图标、原生窗口、YouTube / Bilibili 下载、电脑微信视频号捕捉、码率选择、有声 MP4。头像使用 Haifeng 提供的照片，署名为 `vibe coding by Haifeng.`。
 
 
@@ -51,7 +53,7 @@ Windows x64 桌面软件。红色图标、原生窗口、YouTube / Bilibili 下�
 
 ## 视频号分享链接验证
 
-测试链接 https://weixin.qq.com/sph/AxPpjd9Z3j 可以解析到官方分享页面，但未登录时媒体接口返回 HTTP 401。当前尚未完成登录后的下载验证，因此本版提供电脑微信捕捉和捕捉后的媒体链接复制；分享链接下载模式待登录验证后接入。
+视频号分享链接可以解析到官方分享页面，但未登录时媒体接口返回 HTTP 401。当前尚未完成登录后的下载验证，因此本版提供电脑微信捕捉和捕捉后的媒体链接复制；分享链接下载模式待登录验证后接入。
 
 **验证范围：**已通过隔离 HTTPS 代理、页面注入、自动名称解析、重复捕捉、64 位解码参数、真实 FFmpeg 转码及音频非静音检测。19 项自动测试、中英文界面切换及默认原画质检查通过；Bilibili 真实视频解析、下载和有声音频检查通过。当前电脑尚未启用微信系统捕捉，未进行登录微信实播验证。
 
@@ -63,6 +65,22 @@ Windows x64 桌面软件。红色图标、原生窗口、YouTube / Bilibili 下�
 
 源码开发：安装 Node.js 24+，运行 `npm install`，再安装 Electron 44.5.1 开发依赖。运行 `node setup.mjs` 安装下载工具，运行 `npx electron .` 启动桌面版。运行 `npm test` 验证核心流程。浏览器模式为 `node server.mjs`，默认地址 http://127.0.0.1:8765 。电脑微信捕捉和原生保存窗口仅在桌面版提供。
 
-随包保留第三方许可证；完整 EXE 的工具许可见 THIRD_PARTY_NOTICES.md。
+源码采用 [MIT 许可证](LICENSE)。随包保留第三方许可证；完整 EXE 的工具许可见 [第三方声明](THIRD_PARTY_NOTICES.md)，测试结果见 [验证摘要](validation.json)。
 
 重新打包 EXE：先 `npm install -D electron@44.5.1 resedit@3.1.0`，然后 `node build/package.mjs`；最终文件在源码目录的 `dist/ClipDesk-2.1.0.exe`。Windows 需要自带的 .NET Framework C# 编译器及 PowerShell。
+
+```powershell
+git clone https://github.com/PltuoWang/ClipDesk.git
+cd ClipDesk
+npm install
+npm install -D electron@44.5.1 resedit@3.1.0
+node setup.mjs
+npx electron .
+```
+
+测试与打包：
+
+```powershell
+npm test
+node build/package.mjs
+```
